@@ -7,7 +7,7 @@ import openfl.events.Event;
 import openfl.Lib;
 
 /**
- * ...
+ * Main entry point of game.
  * @author Shaheed Abdol
  */
 class Main extends Sprite 
@@ -15,6 +15,7 @@ class Main extends Sprite
 	private var engine:GameEngine;	
 	private static var screenW:Int;
 	private static var screenH:Int;
+	private var fpsDisplay:FPSDisplay;
 	
 	public function new() 
 	{
@@ -22,6 +23,10 @@ class Main extends Sprite
 		
 		engine = new GameEngine(screenW, screenH);
 		this.addChild(engine);
+		
+		fpsDisplay = new FPSDisplay(10, 10, 0xffffff);
+		this.addChild(fpsDisplay);
+
 		addEventListener(Event.ADDED_TO_STAGE, setup);
 	}
 

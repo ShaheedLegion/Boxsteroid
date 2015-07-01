@@ -30,28 +30,15 @@ class GameStateManager extends Sprite
 		gameStates = new Array<GameState>();
 		currentState = 0;	//point to the first game state.
 		
-		gameStates.push(new GameStateMenu(w, h, actionMan));
-		
-		Sys.println("Adding game state - " + gameStates[currentState]);
-		
+		gameStates.push(new GameStateMenu(w, h, actionMan));		
 		addChild(gameStates[currentState]);
-		
-		/*
-		this.graphics.beginFill(0xffffff);
-		this.graphics.drawRect(0, 0, 15, 100);
-		this.graphics.endFill();
-		*/
 	}
 	
 	public function setup(event:Event, stageObj:DisplayObject) {
 		stageObj.addEventListener(KeyboardEvent.KEY_DOWN, keyDown);
 		stageObj.addEventListener(KeyboardEvent.KEY_UP, keyUp);
 		
-		Sys.println("Setup StateManager - " + currentState + ":" + gameStates.length);
 		if (currentState >= 0 && currentState < gameStates.length) {
-			// First pass the action on to the game state.
-			
-			Sys.println("Calling setup on gamestate menu");
 			gameStates[currentState].Setup(this.graphics);
 		}
 	}

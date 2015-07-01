@@ -4,10 +4,12 @@ import inspirational.designs.StateManager;
 import openfl.display.DisplayObject;
 import openfl.display.Sprite;
 import openfl.events.Event;
+
 /**
  * ...
  * @author Shaheed Abdol
  */
+
 class GameEngine extends Sprite
 {
 	private var stateManager:GameStateManager;

@@ -16,24 +16,12 @@ class GameStateMenu extends GameState {
 	
 	// Override some functions in GameState to perform level-specific logic.
 	public override function Setup(graph:Graphics) {		
-		Sys.println("Width and Height " + screenW + ":" + screenH);
-		
 		var bitmapData = Assets.getBitmapData("img/menu.png");
 		bgBitmap = new Bitmap(bitmapData);
 		addChild(bgBitmap);
 
 		width = cast (screenW, Float);
 		height = cast (screenH, Float);
-
-		Sys.println("Bitmap - " + bgBitmap.visible + " info " + bgBitmap.x + "-" + bgBitmap.y + "-" + bgBitmap.width + "-" + bgBitmap.height);
-		Sys.println("Menu info - " + width + ":" + height);
-		
-		// For debugging.
-		graph.beginFill(0xffffff);
-		graph.drawRect(0, 0, 15, 100);
-		graph.endFill();
-		
-		Sys.println("Menu graphics - " + graphics);
 	}
 	
 	public override function HandleEventAction(keyCode:Int) {

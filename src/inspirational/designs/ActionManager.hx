@@ -1,7 +1,7 @@
 package inspirational.designs;
 
 /**
- * ...
+ * Translates platform key events into game actions.
  * @author Shaheed Abdol
  */
 enum Actions {

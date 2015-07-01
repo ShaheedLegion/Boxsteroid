@@ -1,8 +1,10 @@
 package inspirational.designs;
+
 import openfl.display.Sprite;
 
 /**
- * ...
+ * Defines transitions between game states.
+ * Base class for all game states.
  * @author Shaheed Abdol
  */
 
@@ -26,9 +28,6 @@ class Transition extends Sprite
 		screenW = sw;
 		screenH = sh;
 		currentState = Play;
-		
-		Sys.println("Transition - " + width + ":" + height);
-		Sys.println("Passed args - " + sw + ":" + sh);
 	}
 	
 	public function GetTransition():Transitions {

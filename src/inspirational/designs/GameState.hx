@@ -25,8 +25,6 @@ class GameState extends Transition implements TransitionQuery {
 	
 	// Functions that can be overridden in derived classes.
 	public function Setup(graph:Graphics) {
-	  // Does nothing.	
-	  Sys.println("Transision:Setup");
 	}
 	
 	public function HandleEventAction(keyCode:Int) {
