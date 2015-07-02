@@ -14,6 +14,7 @@ import openfl.display.Sprite;
 	 Pause;
 	 GoBack;
 	 GoForward;
+	 Exit;
  }
  
 class Transition extends Sprite

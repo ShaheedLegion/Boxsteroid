@@ -23,6 +23,10 @@ class GameState extends Transition implements TransitionQuery {
 		return GetTransition();
 	}
 	
+	public function GameStateRemoved() {
+		SetTransition(Waiting);
+	}
+	
 	// Functions that can be overridden in derived classes.
 	public function Setup(graph:Graphics) {
 	}

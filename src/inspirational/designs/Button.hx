@@ -12,21 +12,19 @@ import openfl.events.MouseEvent;
 
  class Button extends Sprite {
 	 
-	public function new(tx:Int, ty:Int)
+	public function new()
     {
         super();
- 
-		x = tx;
-		y = ty;
     }
 	 
 	
-	public function Setup(w:Int, h:Int, label:String) {
+	public function Setup(tx:Int, ty:Int, w:Int, h:Int, label:String) {
 		this.addChild(new ButtonText(w, h, label));
 		
+		x = tx;
+		y = ty;
 		width = w;
 		height = h;
-		Sys.println("Button width - " + width + ":" + w);
 		
         drawBasicRect(false);
 		addEventListener(MouseEvent.MOUSE_OVER, drawBasicRectOver);
@@ -35,8 +33,6 @@ import openfl.events.MouseEvent;
 	
 	function drawBasicRect(highlight:Bool)
     {
-		Sys.println("Drawing basic rect - " + width);
-		
         this.graphics.beginFill( highlight ? 0xFFFFFF : 0xbb0000 );
         this.graphics.drawRoundRect( 0, 0, width, height, 10, 10 );
         this.graphics.endFill();
@@ -66,7 +62,5 @@ class ButtonText extends TextField
 		height = h;
 		
 		defaultTextFormat = messageFormat;
-		
-		Sys.println("W - " + w + ":" + width + ":" + label);
 	}
 }

@@ -11,7 +11,7 @@ import openfl.events.KeyboardEvent;
 import openfl.system.System;
 
 /**
- * ...
+ * This class manages a hypothetical 'backstack' which contains the history of child controls added to it.
  * @author Shaheed Abdol
  */
 
@@ -30,7 +30,8 @@ class GameStateManager extends Sprite
 		gameStates = new Array<GameState>();
 		currentState = 0;	//point to the first game state.
 		
-		gameStates.push(new GameStateMenu(w, h, actionMan));		
+		gameStates.push(new GameStateMenu(w, h, actionMan));
+		gameStates.push(new GameStatePlay(w, h, actionMan));
 		addChild(gameStates[currentState]);
 	}
 	
@@ -47,21 +48,6 @@ class GameStateManager extends Sprite
 		if (currentState >= 0 && currentState < gameStates.length) {
 			// First pass the action on to the game state.
 			gameStates[currentState].HandleEventAction(event.keyCode);
-
-			var transition:Transitions = gameStates[currentState].GetTransitionState();
-			
-			if (transition == GoBack) {
-				// Check if we can manage to 'pop' an item from the hypothetical backstack.
-				if (currentState - 1 < 0)
-					System.exit(0);
-				else 
-					--currentState;
-			} else if (transition == GoForward) {
-				if (currentState + 1 > gameStates.length - 1)
-					currentState = 0;
-				else
-					System.exit(0);
-			}
 		}
 	}
 	
@@ -79,7 +65,38 @@ class GameStateManager extends Sprite
 	
 	public function render(event:Event) {
 		if (currentState >= 0 && currentState < gameStates.length) {
+			var transition:Transitions = gameStates[currentState].GetTransitionState();
+			HandleTransition(transition);
 			gameStates[currentState].Render(event);
+		}
+	}
+	
+	public function HandleTransition(transition:Transitions) {
+		if (transition == GoBack) {
+			// Check if we can manage to 'pop' an item from the hypothetical backstack.
+			if (currentState - 1 < 0)
+				System.exit(0);
+			else {
+				removeChild(gameStates[currentState]);
+				gameStates[currentState].GameStateRemoved();
+				--currentState;
+				addChild(gameStates[currentState]);
+			}
+		} else if (transition == GoForward) {
+			if (currentState + 1 > gameStates.length - 1) {
+				removeChild(gameStates[currentState]);
+				gameStates[currentState].GameStateRemoved();
+				currentState = 0;
+				addChild(gameStates[currentState]);
+			}
+			else {
+				removeChild(gameStates[currentState]);
+				gameStates[currentState].GameStateRemoved();
+				++currentState;
+				addChild(gameStates[currentState]);
+			}
+		} else if (transition == Exit) {
+			System.exit(0);
 		}
 	}
 }

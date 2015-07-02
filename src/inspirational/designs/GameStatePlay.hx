@@ -2,37 +2,35 @@ package inspirational.designs;
 
 import openfl.Assets;
 import openfl.display.Bitmap;
+import openfl.display.BitmapData;
 import openfl.display.Graphics;
 import openfl.events.Event;
 import openfl.events.MouseEvent;
 
-class GameStateMenu extends GameState {
+/**
+ * The playing game state. This class will deal with all game-specific logic.
+ * @author Shaheed Abdol
+ */
+
+class GameStatePlay extends GameState
+{
 	private var bgBitmap:Bitmap;
 	
-	public function new(w:Int, h:Int, actionMan:ActionManager) {
+	public function new(w:Int, h:Int, actionMan:ActionManager) 
+	{
 		super(w, h, actionMan);
-	}
-	
-	// Override some functions in GameState to perform level-specific logic.
-	public override function Setup(graph:Graphics) {		
-		var bitmapData = Assets.getBitmapData("img/menu.png");
-		bgBitmap = new Bitmap(bitmapData);
+		
+		var bmpData:BitmapData = new BitmapData(w, h, 0xff3456ff);
+		bgBitmap = new Bitmap(bmpData);
 		addChild(bgBitmap);
-
+		
 		width = cast (screenW, Float);
 		height = cast (screenH, Float);
-		
-		var startBtn:Button = new Button();
-		var exitBtn:Button = new Button();
 
-		addChild(startBtn);
-		addChild(exitBtn);
-		startBtn.Setup(cast( (bgBitmap.width / 2) - 250, Int), cast((bgBitmap.height) - 100, Int), 100, 24, "Start Game");
-		exitBtn.Setup(cast( (bgBitmap.width / 2), Int), cast((bgBitmap.height) - 100, Int), 100, 24, "Exit");
+	}
+	
+	public override function Setup(graph:Graphics) {
 
-		startBtn.addEventListener( MouseEvent.CLICK, onClickStart );
-		exitBtn.addEventListener( MouseEvent.CLICK, onClickExit );
-		
 	}
 	
 	public override function HandleEventAction(keyCode:Int) {
@@ -64,3 +62,6 @@ class GameStateMenu extends GameState {
 		SetTransition(Exit);
 	}
 }
+
+// Add class here that extends sprite and has it's own bitmap data
+// This class will form the basis of enemies and player sprites.
