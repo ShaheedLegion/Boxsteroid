@@ -9,7 +9,13 @@
 	<app main="inspirational.designs.Main" file="Boxsteroid" path="bin" />
 	
 	<window background="#000000" fps="60" />
+	
+	<!--
 	<window fullscreen="true" unless="mobile" />
+	<window width="800" height="600" if="desktop" />
+	<window width="0" height="0" if="html5" />
+	-->
+	<window fullscreen="true" />
 	<window orientation="landscape" vsync="false" antialiasing="0" if="cpp" />
 	
 	<!-- classpath, haxe libs -->

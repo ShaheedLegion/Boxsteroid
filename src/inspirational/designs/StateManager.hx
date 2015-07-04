@@ -4,6 +4,7 @@ import inspirational.designs.ActionManager;
 import inspirational.designs.StateManager.GameStateManager;
 import inspirational.designs.Transition.Transitions;
 import openfl.display.DisplayObject;
+import openfl.display.Graphics;
 
 import openfl.display.Sprite;
 import openfl.events.Event;
@@ -33,6 +34,8 @@ class GameStateManager extends Sprite
 		gameStates.push(new GameStateMenu(w, h, actionMan));
 		gameStates.push(new GameStatePlay(w, h, actionMan));
 		addChild(gameStates[currentState]);
+		
+		Sys.println("New gamestatemanager");
 	}
 	
 	public function setup(event:Event, stageObj:DisplayObject) {
@@ -42,6 +45,7 @@ class GameStateManager extends Sprite
 		if (currentState >= 0 && currentState < gameStates.length) {
 			gameStates[currentState].Setup(this.graphics);
 		}
+		Sys.println("Setup gamestatemanager");
 	}
 
 	private function keyDown(event:KeyboardEvent):Void {
@@ -65,14 +69,14 @@ class GameStateManager extends Sprite
 	
 	public function render(event:Event) {
 		if (currentState >= 0 && currentState < gameStates.length) {
-			var transition:Transitions = gameStates[currentState].GetTransitionState();
-			HandleTransition(transition);
+			HandleTransition(gameStates[currentState].GetTransitionState());
 			gameStates[currentState].Render(event);
 		}
 	}
 	
 	public function HandleTransition(transition:Transitions) {
 		if (transition == GoBack) {
+			Sys.println("Going back");
 			// Check if we can manage to 'pop' an item from the hypothetical backstack.
 			if (currentState - 1 < 0)
 				System.exit(0);
@@ -81,19 +85,26 @@ class GameStateManager extends Sprite
 				gameStates[currentState].GameStateRemoved();
 				--currentState;
 				addChild(gameStates[currentState]);
+				gameStates[currentState].Setup(this.graphics);
+				transition = Waiting;
 			}
 		} else if (transition == GoForward) {
+			Sys.println("Going forward");
 			if (currentState + 1 > gameStates.length - 1) {
 				removeChild(gameStates[currentState]);
 				gameStates[currentState].GameStateRemoved();
 				currentState = 0;
 				addChild(gameStates[currentState]);
+				gameStates[currentState].Setup(this.graphics);
+				transition = Waiting;
 			}
 			else {
 				removeChild(gameStates[currentState]);
 				gameStates[currentState].GameStateRemoved();
 				++currentState;
 				addChild(gameStates[currentState]);
+				gameStates[currentState].Setup(this.graphics);
+				transition = Waiting;
 			}
 		} else if (transition == Exit) {
 			System.exit(0);

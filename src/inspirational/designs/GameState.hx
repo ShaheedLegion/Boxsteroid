@@ -17,6 +17,8 @@ class GameState extends Transition implements TransitionQuery {
 		// All transitions are set to waiting initially.
 		// The actual transitions are coded into the derived classes.
 		SetTransition(Waiting);
+		
+		Sys.println("New GameState");
 	}
 	
 	public function GetTransitionState():Transitions {

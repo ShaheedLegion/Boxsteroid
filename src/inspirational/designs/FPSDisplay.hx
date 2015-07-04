@@ -11,7 +11,8 @@ import openfl.text.TextFormat;
  */
 class FPSDisplay extends TextField
 {
-	private var times:Array<Float>;
+	private var lastBoundary:Float;
+	private var elapsedFrames:Int;
 
 	public function new(inX:Float = 10.0, inY:Float = 10.0, inCol:Int = 0x000000) 
 	{
@@ -22,27 +23,27 @@ class FPSDisplay extends TextField
 		selectable = false;
 		
 		defaultTextFormat = new TextFormat("_sans", 20, inCol);
-		
 		text = "FPS: ";
-		
-		times = [];
+
 		addEventListener(Event.ENTER_FRAME, onEnter);
 		width = 150;
 		height = 70;
+		lastBoundary = 0;
+		elapsedFrames = 0;
 	}
 	
 	private function onEnter(_)
 	{	
 		var now = Timer.stamp();
-		times.push(now);
-		
-		while (times[0] < now - 1)
-			times.shift();
-		
-		if (visible)
-		{	
-			text = "FPS: " + times.length;	
+		if (now - lastBoundary > 1) {
+			if (visible)
+				text = "FPS: " + elapsedFrames;
+			elapsedFrames = 0;
+			lastBoundary = now;
+			return;
 		}
+		
+		++elapsedFrames;
 	}
 	
 }

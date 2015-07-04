@@ -24,9 +24,10 @@ class Main extends Sprite
 		engine = new GameEngine(screenW, screenH);
 		this.addChild(engine);
 		
-		fpsDisplay = new FPSDisplay(10, 10, 0xffffff);
-		this.addChild(fpsDisplay);
+		//fpsDisplay = new FPSDisplay(10, 10, 0xffffff);
+		//this.addChild(fpsDisplay);
 
+		Sys.println("New main");
 		addEventListener(Event.ADDED_TO_STAGE, setup);
 	}
 
@@ -34,12 +35,13 @@ class Main extends Sprite
 		removeEventListener(Event.ADDED_TO_STAGE, setup);		
 		stage.addEventListener(Event.RESIZE, resize);
 		this.addEventListener(Event.ENTER_FRAME, render);
-		
+		Sys.println("Setup main");
 		engine.setup(event, stage);
 	}
 
 	function resize(event:Event) {
 		engine.resize(event);
+		Sys.println("Resize main");
 	}
 	
 	private function render(event:Event):Void {
@@ -50,7 +52,7 @@ class Main extends Sprite
 	{
 		// static entry point
 		Lib.current.stage.align = flash.display.StageAlign.TOP_LEFT;
-		Lib.current.stage.displayState = StageDisplayState.FULL_SCREEN_INTERACTIVE;
+		Lib.current.stage.displayState = StageDisplayState.FULL_SCREEN;
 		screenW = Lib.current.stage.stageWidth;
 		screenH = Lib.current.stage.stageHeight;
 		Lib.current.addChild(new Main());

@@ -11,6 +11,7 @@ class GameStateMenu extends GameState {
 	
 	public function new(w:Int, h:Int, actionMan:ActionManager) {
 		super(w, h, actionMan);
+		Sys.println("New gamestatemenu");
 	}
 	
 	// Override some functions in GameState to perform level-specific logic.
@@ -32,16 +33,18 @@ class GameStateMenu extends GameState {
 
 		startBtn.addEventListener( MouseEvent.CLICK, onClickStart );
 		exitBtn.addEventListener( MouseEvent.CLICK, onClickExit );
-		
+		Sys.println("Setup gamestatemenu");
 	}
 	
 	public override function HandleEventAction(keyCode:Int) {
 		var action:ActionManager.Actions = actionManager.getAction(keyCode);
 
 		if (action == Back) {
+			Sys.println("Going back gamestatemenu");
 			SetTransition(GoBack);
 		}
 		if (action == Confirm) {
+			Sys.println("Going forward gamestatemenu");
 			SetTransition(GoForward);
 		}
 	}
