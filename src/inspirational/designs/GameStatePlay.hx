@@ -1,7 +1,8 @@
 package inspirational.designs;
 
-import haxe.ds.BalancedTree.TreeNode;
-import inspirational.designs.GameStatePlay.DummyItem;
+import inspirational.designs.BSPTree;
+import inspirational.designs.BSPTree.TreeVisualizer;
+
 import openfl.Assets;
 import openfl.display.Bitmap;
 import openfl.display.BitmapData;
@@ -9,6 +10,7 @@ import openfl.display.Graphics;
 import openfl.display.Sprite;
 import openfl.events.Event;
 import openfl.events.MouseEvent;
+import openfl.geom.Rectangle;
 
 /**
  * The playing game state. This class will deal with all game-specific logic.
@@ -21,23 +23,28 @@ class GameStatePlay extends GameState
 	private var bgBitmap:Bitmap;
 	private var enemies:Array<EnemyBlock>;
 	
-	//private var dummyItem:DummyItem;
+	private var treeViz:TreeVisualizer;
+	private var screenRect:Rectangle;
 	
 	public function new(w:Int, h:Int, actionMan:ActionManager) 
 	{
 		super(w, h, actionMan);
 		
-		var bmpData:BitmapData = new BitmapData(w, h, 0xff3456ff);
+		// Represents the entire playable area.
+		screenRect = new Rectangle(0, 0, w, h);
+		screenRect.inflate(100, 100);
+		
+		var bmpData:BitmapData = new BitmapData(Std.int(screenRect.width), Std.int(screenRect.height), 0xff3456ff);
 		bgBitmap = new Bitmap(bmpData);
 		addChild(bgBitmap);
 		
-		width = cast (screenW, Float);
-		height = cast (screenH, Float);
+		width = cast (screenRect.width, Float);
+		height = cast (screenRect.height, Float);
 		
-		bspTree = new BSPTree(width, height);
+		bspTree = new BSPTree(screenRect);
 		enemies = new Array<EnemyBlock>();
 		
-		for (i in 0...100) {
+		for (i in 0...200) {
 			var enemy:EnemyBlock = new EnemyBlock();
 			addChild(enemy);
 			enemies.push(enemy);
@@ -46,11 +53,11 @@ class GameStatePlay extends GameState
 	
 	public override function Setup(graph:Graphics) {
 		for (enemy in enemies) {
-			enemy.Setup(bspTree, bgBitmap.width, bgBitmap.height, 60);
+			enemy.Setup(bspTree, bgBitmap.width, bgBitmap.height, 100);
 		}
 		
-		//dummyItem = new DummyItem(bspTree);
-		//addChild(dummyItem);
+		treeViz = new TreeVisualizer(bspTree);
+		addChild(treeViz);
 	}
 	
 	public override function HandleEventAction(keyCode:Int) {
@@ -73,6 +80,9 @@ class GameStatePlay extends GameState
 	}
 	
 	public override function Render(event:Event) {
+		for (enemy in enemies) {
+			enemy.Update();
+		}
 	}
 	
 	public function onClickStart(event:MouseEvent) {
@@ -105,13 +115,15 @@ class EnemyBlock extends Sprite {
 			y = Math.random() * h;
 			
 			// Check if the tree can handle/place this item, else try a different set of coordinates.
-			wasPlaced = tree.PlaceItem(x + 10, y + 10, myW + 10);
+			wasPlaced = tree.PlaceItem(x - (myW / 2), y - (myW / 2), myW + 10);
 			++tries;  // Only try 3 times to place each item.
 		}
 		
 		if (wasPlaced) {
 			var bmpData:BitmapData = new BitmapData(Std.int(myW), Std.int(myW), 0xff00ff00);
 			bgBitmap = new Bitmap(bmpData);
+			bgBitmap.x = -(myW / 2);
+			bgBitmap.y = -(myW / 2);
 			addChild(bgBitmap);
 			
 			width = myW;
@@ -119,187 +131,9 @@ class EnemyBlock extends Sprite {
 		}
 	}
 	
-}
-
-class TreeNode {
-	private var x:Float;
-	private var y:Float;
-	private var width:Float;
-	private var height:Float;
-	private var left_top:TreeNode;
-	private var right_top:TreeNode;
-	private var left_bottom:TreeNode;
-	private var right_bottom:TreeNode;
-	private var isEmpty:Bool;
-	
-	public function new(px:Float, py:Float, w:Float, h:Float) {
-		x = px;
-		y = py;
-		width = w;
-		height = h;
-		left_top = null;
-		right_top = null;
-		left_bottom = null;
-		right_bottom = null;
-		isEmpty = true;
-	}
-
-	private function Contains(ix:Float, iy:Float, iw:Float):Bool {
-		return ((ix >= x) && (iy >= y) && ((ix + iw) <= (x + width)) && ((iy + iw) <= (y + height)));
+	public function Update() {
+		// Now rotate this item.
+		++this.rotation;
 	}
 	
-	private function GetQuadrant(ix:Float, iy:Float, iw:Float):Int {
-		// Check which quadrant this new item falls into.
-		// If we are empty then just check for equal quadrants
-		if (isEmpty) {
-			var centerX:Float = x + (width / 2);
-			var centerY:Float = y + (height / 2);
-			
-			if (ix + iw <= centerX && (ix >= x)) {	// somewhere on the left of the screen.
-				if (iy + iw <= centerY && (iy >= y))
-					return 0;  // top left
-				if (iy + iw >= centerY && ((iy + iw) <= (y + height)))
-					return 3;  // bottom left
-			} else if (ix + iw >= centerX && ((ix + iw) <= (x + width))) {	//somewhere on the right of the screen.
-				if (iy + iw <= centerY && (iy >= y))
-					return 1;  // top right
-				if (iy + iw >= centerY && ((iy + iw) <= (y + height)))
-					return 2;  // bottom right
-			}
-			return 4;  // doesn't fit anywhere.
-		}
-		
-		if (left_top != null) { if (left_top.Contains(ix, iy, iw)) return 0; }
-		if (right_top != null) { if (right_top.Contains(ix, iy, iw)) return 1; }
-		if (right_bottom != null) { if (right_bottom.Contains(ix, iy, iw)) return 2; }
-		if (left_bottom != null) { if (left_bottom.Contains(ix, iy, iw)) return 3; }
-		
-		return 4;
-	}
-
-	private function Emplace(tn:TreeNode, ix:Float, iy:Float, iw:Float):TreeNode {
-		if (tn != null) {
-			if (tn.isEmpty && tn.Contains(ix, iy, iw))
-				return tn;
-				
-			var node:TreeNode = Emplace(tn.left_top, ix, iy, iw);
-			if (node != null) return node;
-			
-			node = Emplace(tn.right_top, ix, iy, iw);
-			if (node != null) return node;
-
-			node = Emplace(tn.right_bottom, ix, iy, iw);
-			if (node != null) return node;
-			
-			node = Emplace(tn.left_bottom, ix, iy, iw);
-			if (node != null) return node;
-		}
-		return null;
-	}
-	public function PlaceItem(ix:Float, iy:Float, iw:Float):Bool {
-		if (isEmpty) {
-			var polyQuad:Int = GetQuadrant(ix, iy, iw);
-			if (polyQuad == 4)  // Could not find quadrant.
-				return false;
-
-			left_top = new TreeNode(x, y, ix + iw, iy + iw);
-			if (polyQuad == 0) left_top.isEmpty = false;
-			
-			right_top = new TreeNode(x + ix + iw, y, width - (ix + iw), iy + iw);
-			if (polyQuad == 1) right_top.isEmpty = false;
-			
-			right_bottom = new TreeNode(x + ix + iw, y + iy + iw, width - (ix + iw), height - (iy + iw));
-			if (polyQuad == 2) right_bottom.isEmpty = false;
-			
-			left_bottom = new TreeNode(x, y + iy + iw, ix + iw, height - (iy + iw));
-			if (polyQuad == 3) left_bottom.isEmpty = false;
-
-			isEmpty = false;
-			return true;
-		}
-
-		var placementNode:TreeNode = Emplace(left_top, ix, iy, iw);
-		if (placementNode != null) { return placementNode.PlaceItem(ix, iy, iw); }
-		
-		placementNode = Emplace(right_top, ix, iy, iw);
-		if (placementNode != null) { return placementNode.PlaceItem(ix, iy, iw); }
-		
-		placementNode = Emplace(right_bottom, ix, iy, iw);
-		if (placementNode != null) { return placementNode.PlaceItem(ix, iy, iw); }
-				
-		placementNode = Emplace(left_bottom, ix, iy, iw);
-		if (placementNode != null) { return placementNode.PlaceItem(ix, iy, iw); }
-		
-		return false;
-		/*
-		// This node is not empty (contains some poly somewhere)
-		// Check if we can still fit the poly somewhere.
-		switch (polyQuad) {
-		case 0:
-			if (left_top != null && left_top.isEmpty)
-				return left_top.PlaceItem(ix, iy, iw);
-		case 1:
-			if (right_top != null && right_top.isEmpty)
-				return right_top.PlaceItem(ix, iy, iw);
-		case 2:
-			if (right_bottom != null && right_bottom.isEmpty)
-				return right_bottom.PlaceItem(ix, iy, iw);
-		case 3:
-			if (left_bottom != null && left_bottom.isEmpty)
-				return left_bottom.PlaceItem(ix, iy, iw);
-		}
-
-		return false;
-		*/
-	}
-	
-	public function DrawTree(graph:Graphics, col:Int) {
-		if (isEmpty)
-			return;
-
-		graph.lineStyle(2, col, 1);
-		var diff:Int = 0x222222;
-		if (left_top != null && !left_top.isEmpty)
-		{
-			graph.drawRect(left_top.x, left_top.y, left_top.width, left_top.height);
-			left_top.DrawTree(graph, col - diff);
-		}
-		if (right_top != null && !right_top.isEmpty)
-		{
-			graph.drawRect(right_top.x, right_top.y, right_top.width, right_top.height);
-			right_top.DrawTree(graph, col - diff);
-		}
-		if (right_bottom != null && !right_bottom.isEmpty)
-		{
-			graph.drawRect(right_bottom.x, right_bottom.y, right_bottom.width, right_bottom.height);
-			right_bottom.DrawTree(graph, col - diff);
-		}
-		if (left_bottom != null && !left_bottom.isEmpty)
-		{
-			graph.drawRect(left_bottom.x, left_bottom.y, left_bottom.width, left_bottom.height);
-			left_bottom.DrawTree(graph, col - diff);
-		}
-	}
-}
-class BSPTree {
-	private var root:TreeNode;
-
-	public function new (w:Float, h:Float) {
-		root = new TreeNode(0, 0, w, h);
-	}
-
-	public function PlaceItem(x:Float, y:Float, w:Float):Bool {
-		return root.PlaceItem(x, y, w);
-	}
-	
-	public function DrawTree(graphObj:Graphics) {
-		root.DrawTree(graphObj, 0xffffff);
-	}
-}
-
-class DummyItem extends Sprite {
-	public function new(bspTree:BSPTree) {
-		super();
-		bspTree.DrawTree(this.graphics);
-	}
 }
