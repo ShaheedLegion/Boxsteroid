@@ -44,7 +44,7 @@ class GameStatePlay extends GameState
 		bspTree = new BSPTree(screenRect);
 		enemies = new Array<EnemyBlock>();
 		
-		for (i in 0...200) {
+		for (i in 0...300) {
 			var enemy:EnemyBlock = new EnemyBlock();
 			addChild(enemy);
 			enemies.push(enemy);
@@ -115,7 +115,7 @@ class EnemyBlock extends Sprite {
 			y = Math.random() * h;
 			
 			// Check if the tree can handle/place this item, else try a different set of coordinates.
-			wasPlaced = tree.PlaceItem(x - (myW / 2), y - (myW / 2), myW + 10);
+			wasPlaced = tree.PlaceItem(x - (myW / 2), y - (myW / 2), myW + (myW / 2));
 			++tries;  // Only try 3 times to place each item.
 		}
 		
